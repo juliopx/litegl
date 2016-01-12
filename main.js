@@ -14,6 +14,10 @@ exports.Octree = require('./src/octree.js')
 exports.FBO = require('./src/fbo.js')
 exports.utils = require('./src/utils.js')
 
+raytracer = require('./src/raytracer.js')
+exports.HitTest = raytracer.HitTest
+exports.Raytracer = raytracer.Raytracer
+
 var mesh = require('./src/mesh.js')
 exports.Indexer = mesh.Indexer
 exports.Buffer = mesh.Buffer
