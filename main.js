@@ -13,5 +13,5 @@ var mesh = require('./src/mesh.js')
 exports.Indexer = mesh.Indexer
 exports.Buffer = mesh.Buffer
 exports.Mesh = mesh.Mesh
-exports.primitives = require('./src/primitives.js')
+exports.Mesh.primitives = require('./src/primitives.js')
 exports.utils = require('./src/utils.js')

@@ -14,7 +14,7 @@ container.appendChild(gl.canvas);
 gl.animate();
 
 //build the mesh
-var mesh = GL.primitives.sphere({size:10});
+var mesh = GL.Mesh.primitives.sphere({size:10});
 var texture = GL.Texture.cubemapFromURL("cross-cubemap.png",{temp_color:[80,120,40,255], is_cross: 1, minFilter: gl.LINEAR_MIPMAP_LINEAR });
 
 //create basic matrices for cameras and transformation
