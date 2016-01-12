@@ -12,7 +12,7 @@ var Texture = require('./texture.js').Texture;
 var LEvent = require('./levent.js').LEvent;
 var utils = require('./utils.js');
 
-last_context_id = 0
+var last_context_id = 0
 
 GL.create = function(options) {
 	options = options || {};
@@ -131,11 +131,11 @@ GL.create = function(options) {
 		var context = this;
 
 		//loop only if browser tab visible
-		function loop() {
+		function draw_loop() {
 			if(gl.destroyed) //to stop rendering once it is destroyed
 				return;
 
-			context._requestFrame_id = post(loop); //do it first, in case it crashes
+			context._requestFrame_id = post(draw_loop); //do it first, in case it crashes
 
 			var now = utils.getTime();
 			var dt = (now - time) * 0.001;
@@ -156,7 +156,7 @@ GL.create = function(options) {
 			}
 			time = now;
 		}
-		this._requestFrame_id = post(loop); //launch main loop
+		this._requestFrame_id = post(draw_loop); //launch main loop
 	}
 
 	//store binded to be able to remove them if destroyed
@@ -244,13 +244,13 @@ GL.create = function(options) {
 	*/
 	gl.fullscreen = function()
 	{
-		var canvas = this.canvas;
-		if(canvas.requestFullScreen)
-			canvas.requestFullScreen();
-		else if(canvas.webkitRequestFullScreen)
-			canvas.webkitRequestFullScreen();
-		else if(canvas.mozRequestFullScreen)
-			canvas.mozRequestFullScreen();
+		var c = this.canvas;
+		if(c.requestFullScreen)
+			c.requestFullScreen();
+		else if(c.webkitRequestFullScreen)
+			c.webkitRequestFullScreen();
+		else if(c.mozRequestFullScreen)
+			c.mozRequestFullScreen();
 		else
 			console.error("Fullscreen not supported");
 	}
@@ -267,25 +267,25 @@ GL.create = function(options) {
 	*/
 	gl.snapshot = function(startx, starty, areax, areay, skip_reverse)
 	{
-		var canvas = createCanvas(areax,areay);
-		var ctx = canvas.getContext("2d");
-		var pixels = ctx.getImageData(0,0,canvas.width,canvas.height);
+		var c = createCanvas(areax,areay);
+		var old_ctx = c.getContext("2d");
+		var pixels = old_ctx.getImageData(0,0,c.width,c.height);
 
 		var buffer = new Uint8Array(areax * areay * 4);
-		gl.readPixels(startx, starty, canvas.width, canvas.height, gl.RGBA,gl.UNSIGNED_BYTE, buffer);
+		gl.readPixels(startx, starty, c.width, c.height, gl.RGBA,gl.UNSIGNED_BYTE, buffer);
 
 		pixels.data.set( buffer );
-		ctx.putImageData(pixels,0,0);
+		old_ctx.putImageData(pixels,0,0);
 
 		if(skip_reverse)
 			return canvas;
 
 		//flip image
 		var final_canvas = createCanvas(areax,areay);
-		var ctx = final_canvas.getContext("2d");
-		ctx.translate(0,areay);
-		ctx.scale(1,-1);
-		ctx.drawImage(canvas,0,0);
+		var new_ctx = final_canvas.getContext("2d");
+		new_ctx.translate(0,areay);
+		new_ctx.scale(1,-1);
+		new_ctx.drawImage(canvas,0,0);
 
 		return final_canvas;
 	}

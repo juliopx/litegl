@@ -1,11 +1,10 @@
 
-//create the rendering context
 // Copy example.html and files required by index.html in webpack
 require('file?name=example.html!./example.html')
 require('!!file?name=cross-cubemap.png!./cross-cubemap.png')
 require('file?name=style.css!./style.css')
 
-
+//create the rendering context
 var container = document.body;
 var GL = require('../main.js');
 var glm = require('../src/gl-matrix-extra.js'), mat3=glm.mat3, mat4=glm.mat4,
