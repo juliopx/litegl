@@ -15,3 +15,4 @@ exports.Buffer = mesh.Buffer
 exports.Mesh = mesh.Mesh
 exports.Mesh.primitives = require('./src/primitives.js')
 exports.utils = require('./src/utils.js')
+exports.FBO = require('./src/fbo.js')
