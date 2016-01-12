@@ -9,12 +9,17 @@
 exports.create = require('./src/core.js').create
 exports.Texture = require('./src/texture.js').Texture
 exports.Shader = require('./src/shader.js').Shader
+exports.events = require('./src/events.js')
+exports.Octree = require('./src/octree.js')
+exports.FBO = require('./src/fbo.js')
+exports.utils = require('./src/utils.js')
+
 var mesh = require('./src/mesh.js')
 exports.Indexer = mesh.Indexer
 exports.Buffer = mesh.Buffer
 exports.Mesh = mesh.Mesh
 exports.Mesh.primitives = require('./src/primitives.js')
-exports.utils = require('./src/utils.js')
-exports.events = require('./src/events.js')
-exports.FBO = require('./src/fbo.js')
-exports.Octree = require('./src/octree.js')
+//these libraries are added to Mesh
+parsers = require('./src/parsers.js')
+exports.Mesh.parsers['obj'] = parsers.parseOBJ.bind(exports.Mesh)
+exports.Mesh.enconders['obj'] = parsers.encoderOBJ

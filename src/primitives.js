@@ -8,6 +8,8 @@ var glm = require('./gl-matrix-extra.js'), mat3=glm.mat3, mat4=glm.mat4,
 	vec2=glm.vec2, vec3=glm.vec3, vec4=glm.vec4, quat=glm.quat;
 var Mesh = require('./mesh.js').Mesh
 var BBox = require('./geo.js').BBox
+
+//It will be added to Mesh on main.js
 exports.plane = function(options) {
 	options = options || {};
 	options.triangles = [];
