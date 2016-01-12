@@ -1,0 +1,19 @@
+/**/node_modules/*
+/_cache/*
+/build/*
+/Examples/build/*
+*.blend1
+*.blend2
+*.pyc
+/assets/*
+*~
+.directory
+*.kate-swp
+*.orig
+*.rej
+
+#log files
+npm-debug.log
+local/
+*.local.*
+Thumbs.db
