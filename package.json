@@ -1,0 +1,22 @@
+{
+  "name": "litegl",
+  "version": "0.0.1",
+  "description": "This is a fork of https://github.com/jagenjo/litegl.js to get it working as node module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "gl-matrix": "^2.3.1",
+    "source-map-loader": "^0.1.5",
+    "webpack": "^1.12.11"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://root@pixelements.net/root/repositories/litegl.git"
+  },
+  "keywords": [
+    "litegl"
+  ],
+  "author": "Julio Manuel López <julio@pixelements.net> (http://pixelements.net)",
+  "license": "ISC"
+}
