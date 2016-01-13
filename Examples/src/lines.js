@@ -80,7 +80,7 @@ function init()
 
         gl.onupdate = function(dt)
         {
-            if(events.mouse.left === true){
+            if(events.mouse.left){
                 mat4.rotateY(model,model,events.mouse.rel_x * 0.01);
                 cam_pos[1] += events.mouse.rel_y;
             }

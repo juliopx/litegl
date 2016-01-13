@@ -297,7 +297,7 @@ gl.onupdate = function(dt)
         light.position[2] = Math.cos( i * 2 + time + 5 ) * 50;
 
         //rotate camera position
-        if(events.mouse.left === true){
+        if(events.mouse.left){
             vec3.rotateY( camera_position, camera_position, events.mouse.rel_x * 0.01 );
             camera_position[1] -= events.mouse.rel_y  * 0.5;
         }

@@ -86,7 +86,7 @@ gl.onupdate = function(dt)
     mat4.rotateY(model,model,dt*0.2);
 
     //rotate sphere acording mouse movement
-    if(events.mouse.left === true){
+    if(events.mouse.left){
         mat4.rotateY(model,model,dt*events.mouse.rel_x * 0.5)
         mat4.rotateX(model,model,dt*events.mouse.rel_y * 0.5)
     }
