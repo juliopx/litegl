@@ -5,10 +5,10 @@
 // Global input state (to be put in a closure or class)
 
 // All are just 1 or 0
-var keys_pressed = new Uint8Array(256);
-var keys_just_pressed = new Uint8Array(256);
-var keys_just_released = new Uint8Array(256);
-var keys_pressed_count = 0;
+var keys_pressed = exports.key_pressed =  new Uint8Array(256);
+var keys_just_pressed = exports.keys_just_pressed = new Uint8Array(256);
+var keys_just_released = exports.keys_just_released = new Uint8Array(256);
+var keys_pressed_count = exports.keys_pressed_count = 0;
 
 var NO_MOVE_TICKS = 3;
 

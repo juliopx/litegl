@@ -13,6 +13,7 @@ exports.events = require('./src/events.js')
 exports.Octree = require('./src/octree.js')
 exports.FBO = require('./src/fbo.js')
 exports.utils = require('./src/utils.js')
+exports.glmatrix = require('./src/gl-matrix-extra.js')
 
 raytracer = require('./src/raytracer.js')
 exports.HitTest = raytracer.HitTest

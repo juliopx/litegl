@@ -7,12 +7,13 @@ require('file?name=style.css!./style.css')
 //create the rendering context
 var container = document.body;
 var GL = require('../litegl.js');
-var glm = require('../src/gl-matrix-extra.js'), mat3=glm.mat3, mat4=glm.mat4,
+var glm = GL.glmatrix, mat3=glm.mat3, mat4=glm.mat4,
     vec2=glm.vec2, vec3=glm.vec3, vec4=glm.vec4, quat=glm.quat;
 var gl = GL.create({width: container.offsetWidth, height: container.offsetHeight});
 container.appendChild(gl.canvas);
 gl.animate();
 
+window.GL = GL
 //build the mesh
 var mesh = GL.Mesh.primitives.sphere({size:10});
 var texture = GL.Texture.cubemapFromURL("cross-cubemap.png",{temp_color:[80,120,40,255], is_cross: 1, minFilter: gl.LINEAR_MIPMAP_LINEAR });
@@ -76,10 +77,22 @@ gl.ondraw = function()
         u_mvp: mvp
     }).draw(mesh);
 };
+//define the elememt that will recive the events:
+var events = GL.events
+events.set_generic_events(container)
 
 //update loop
 gl.onupdate = function(dt)
 {
-    //rotate cube
+    //constant sphere rotation
     mat4.rotateY(model,model,dt*0.2);
+
+    //rotate sphere acording mouse movement
+    if(events.mouse.left === true){
+    mat4.rotateY(model,model,dt*events.mouse.rel_x * 0.5)
+    }
+    if(events.mouse.left === true){
+    mat4.rotateX(model,model,dt*events.mouse.rel_y * 0.5)
+    }
+    events.reset_frame_events()
 };
