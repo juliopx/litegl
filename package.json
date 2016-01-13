@@ -1,6 +1,6 @@
 {
   "name": "litegl",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "This is a fork of https://github.com/jagenjo/litegl.js to get it working as node module",
   "main": "litegl.js",
   "scripts": {

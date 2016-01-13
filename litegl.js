@@ -26,4 +26,4 @@ exports.Mesh.primitives = require('./src/primitives.js')
 //these libraries are added to Mesh
 parsers = require('./src/parsers.js')
 exports.Mesh.parsers['obj'] = parsers.parseOBJ.bind(exports.Mesh)
-exports.Mesh.enconders['obj'] = parsers.encoderOBJ
+exports.Mesh.encoders['obj'] = parsers.encoderOBJ
