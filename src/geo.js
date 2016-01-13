@@ -2,7 +2,7 @@
 var GL = module.exports;
 var glm = require('./gl-matrix-extra.js'), mat3=glm.mat3, mat4=glm.mat4,
 	vec2=glm.vec2, vec3=glm.vec3, vec4=glm.vec4, quat=glm.quat;
-
+var EPSILON = require('./utils.js').EPSILON
 /* geometric utilities */
 var CLIP_INSIDE = GL.CLIP_INSIDE = 0;
 var CLIP_OUTSIDE = GL.CLIP_OUTSIDE = 1;
@@ -13,7 +13,7 @@ var CLIP_OVERLAP = GL.CLIP_OVERLAP = 2;
 * @class geo
 */
 
-var geo = {
+var geo = GL.geo = {
 
 	/**
 	* Returns a float4 containing the info about a plane with normal N and that passes through point P
