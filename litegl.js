@@ -11,7 +11,7 @@ exports.Texture = require('./src/texture.js').Texture
 exports.Shader = require('./src/shader.js').Shader
 exports.events = require('./src/events.js')
 exports.Octree = require('./src/octree.js')
-exports.FBO = require('./src/fbo.js')
+exports.FBO = require('./src/fbo.js').FBO
 exports.utils = require('./src/utils.js')
 exports.glmatrix = require('./src/gl-matrix-extra.js')
 

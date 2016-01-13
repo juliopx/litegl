@@ -9,6 +9,8 @@ var GL = module.exports;
 var glm = require('./gl-matrix-extra.js'), mat3=glm.mat3, mat4=glm.mat4,
 	vec2=glm.vec2, vec3=glm.vec3, vec4=glm.vec4, quat=glm.quat;
 var Texture = require('./texture.js').Texture;
+var Shader = require('./shader.js').Shader
+var Mesh = require('./mesh.js').Mesh
 var LEvent = require('./levent.js').LEvent;
 var utils = require('./utils.js');
 

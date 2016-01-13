@@ -1,9 +1,10 @@
-
 // Copy files required
-require('!!file?name=cross-cubemap.png!./cross-cubemap.png')
-
+require('!!file?name=/texture.jpg!../static-files/texture.jpg')
 
 //create the rendering context
+var GL = require('../../litegl.js');
+var glm = GL.glmatrix, mat3=glm.mat3, mat4=glm.mat4,
+    vec2=glm.vec2, vec3=glm.vec3, vec4=glm.vec4, quat=glm.quat;
 var gl = GL.create({width: window.innerWidth,height: window.innerHeight});
 var container = document.body;
 container.appendChild(gl.canvas);
@@ -12,9 +13,9 @@ gl.animate();
 var camera_position = vec3.fromValues(0,100,100);
 
 //build the mesh
-var mesh = GL.Mesh.cube({size:10});
-var plane = GL.Mesh.plane({size:500,xz: true});
-var sphere = GL.Mesh.sphere({size:1});
+var mesh = GL.Mesh.primitives.cube({size:10});
+var plane = GL.Mesh.primitives.plane({size:500,xz: true});
+var sphere = GL.Mesh.primitives.sphere({size:1});
 
 var texture = GL.Texture.fromURL("texture.jpg", { minFilter: gl.LINEAR});
 
@@ -40,23 +41,13 @@ var mvp = mat4.create();
 var temp = mat4.create();
 var identity = mat4.create();
 
-//get mouse actions
-gl.captureMouse();
-gl.onmousemove = function(e)
-{
-    if(e.dragging)
-    {
-        vec3.rotateY( camera_position, camera_position, e.deltax * 0.01 );
-        camera_position[1] -= e.deltay * 0.5;
-    }
-}
 
 //set the camera position
-mat4.perspective(proj, 45 * DEG2RAD, gl.canvas.width / gl.canvas.height, 5, 1000);
+mat4.perspective(proj, 45 * GL.utils.DEG2RAD, gl.canvas.width / gl.canvas.height, 5, 1000);
 mat4.lookAt(view, camera_position, [0,0,0], [0,1,0]);
 
 //basic shader: renders the gbuffers
-var gbuffers_shader = new Shader('\
+var gbuffers_shader = new GL.Shader('\
     precision highp float;\
     attribute vec3 a_vertex;\
     attribute vec3 a_normal;\
@@ -129,7 +120,7 @@ var final_fragment_shader = '\
     ';
 
 //basic shader
-var final_global_shader = new Shader('\
+var final_global_shader = new GL.Shader('\
     precision highp float;\
     attribute vec3 a_vertex;\
     void main() {\
@@ -137,7 +128,7 @@ var final_global_shader = new Shader('\
     }\
     ', final_fragment_shader );
 
-var final_light_shader = new Shader('\
+var final_light_shader = new GL.Shader('\
     precision highp float;\
     attribute vec3 a_vertex;\
     uniform mat4 u_mvp;\
@@ -280,14 +271,37 @@ gl.ondraw = function()
     gl.drawTexture(texture_final, gl.canvas.width * 0.5, gl.canvas.height * 0.5, gl.canvas.width * 0.5, gl.canvas.height * 0.5);
 };
 
+//get mouse actions
+// gl.captureMouse();
+// gl.onmousemove = function(e)
+// {
+//     if(e.dragging)
+//     {
+//         vec3.rotateY( camera_position, camera_position, e.deltax * 0.01 );
+//         camera_position[1] -= e.deltay * 0.5;
+//     }
+// }
+
+//define the elememt that will recive the events:
+var events = GL.events
+events.set_generic_events(container)
+
 //update loop
 gl.onupdate = function(dt)
 {
-    var time = getTime() * 0.001;
+    var time = GL.utils.getTime() * 0.001;
     for(var i = 0; i < lights.length; i++)
     {
         var light = lights[i];
         light.position[0] = Math.sin( i + time ) * 100;
         light.position[2] = Math.cos( i * 2 + time + 5 ) * 50;
+
+        //rotate camera position
+        if(events.mouse.left === true){
+            vec3.rotateY( camera_position, camera_position, events.mouse.rel_x * 0.01 );
+            camera_position[1] -= events.mouse.rel_y  * 0.5;
+        }
+        events.reset_frame_events()
+
     }
 };

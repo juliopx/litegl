@@ -1,12 +1,10 @@
 
-// Copy example.html and files required by index.html in webpack
-require('file?name=example.html!./example.html')
-require('!!file?name=cross-cubemap.png!./cross-cubemap.png')
-require('file?name=style.css!./style.css')
+// Copy files required
+require('!!file?name=cross-cubemap.png!../static-files/cross-cubemap.png')
 
 //create the rendering context
 var container = document.body;
-var GL = require('../litegl.js');
+var GL = require('../../litegl.js');
 var glm = GL.glmatrix, mat3=glm.mat3, mat4=glm.mat4,
     vec2=glm.vec2, vec3=glm.vec3, vec4=glm.vec4, quat=glm.quat;
 var gl = GL.create({width: container.offsetWidth, height: container.offsetHeight});
