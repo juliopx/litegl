@@ -27,7 +27,14 @@ function init()
     var mvp = mat4.create();
     var temp = mat4.create();
 
-
+    //get mouse actions
+    gl.captureMouse();
+    gl.onmousemove = function(e)
+    {
+        if(e.dragging)
+            mat4.rotateY(model,model,e.deltax * 0.01);
+    }
+    
     //set the camera position
     mat4.perspective(proj, 45 * GL.utils.DEG2RAD, gl.canvas.width / gl.canvas.height, 0.1, 1000);
 
@@ -141,20 +148,12 @@ function init()
         }
     }
 
-    var events = GL.events
-    events.set_generic_events(container)
-
-    //update loop
+        //update loop
     gl.onupdate = function(dt)
     {
         //constant sphere rotation
         mat4.rotateY(model,model,dt*0.2);
 
-        //rotate sphere acording mouse movement
-        if(events.mouse.left){
-            mat4.rotateY(model,model,dt*events.mouse.rel_x * 0.5)
-        }
-        events.reset_frame_events()
     };
 }
 init()

@@ -209,7 +209,319 @@ GL.create = function(options) {
 		}
 	};
 
-		
+	gl.captureMouse = function(capture_wheel) {
+
+		canvas.addEventListener("mousedown", onmouse);
+		canvas.addEventListener("mousemove", onmouse);
+		if(capture_wheel)
+		{
+			canvas.addEventListener("mousewheel", onmouse, false);
+			canvas.addEventListener("wheel", onmouse, false);
+			//canvas.addEventListener("DOMMouseScroll", onmouse, false); //deprecated or non-standard
+		}
+		//prevent right click context menu
+		canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); return false; });
+
+		canvas.addEventListener("touchstart", ontouch, true);
+		canvas.addEventListener("touchmove", ontouch, true);
+		canvas.addEventListener("touchend", ontouch, true);
+		canvas.addEventListener("touchcancel", ontouch, true);
+
+		canvas.addEventListener('gesturestart', ongesture );
+		canvas.addEventListener('gesturechange', ongesture );
+		canvas.addEventListener('gestureend', ongesture );
+	}
+
+	function onmouse(e) {
+		var old_mouse_mask = gl.mouse_buttons;
+		GL.augmentEvent(e, canvas);
+		e.eventType = e.eventType || e.type; //type cannot be overwritten, so I make a clone to allow me to overwrite
+		var now = utils.getTime();
+
+		//gl.mouse info
+		mouse.dragging = e.dragging;
+		mouse.x = e.canvasx;
+		mouse.y = e.canvasy;
+		mouse.left_button = gl.mouse_buttons & (1<<GL.LEFT_MOUSE_BUTTON);
+		mouse.right_button = gl.mouse_buttons & (1<<GL.RIGHT_MOUSE_BUTTON);
+		//console.log(e.eventType, e.mousex, e.mousey, e.deltax, e.deltay );
+
+		if(e.eventType == "mousedown")
+		{
+			if(e.leftButton)
+				mouse.left_button = true;
+			if(e.rightButton)
+				mouse.right_button = true;
+
+			if(old_mouse_mask == 0) //no mouse button was pressed till now
+			{
+				canvas.removeEventListener("mousemove", onmouse);
+				var doc = canvas.ownerDocument;
+				doc.addEventListener("mousemove", onmouse);
+				doc.addEventListener("mouseup", onmouse);
+			}
+			last_click_time = now;
+
+			if(gl.onmousedown)
+				gl.onmousedown(e);
+			LEvent.trigger(gl,"mousedown");
+		}
+		else if(e.eventType == "mousemove")
+		{
+			if(gl.onmousemove)
+				gl.onmousemove(e);
+			LEvent.trigger(gl,"mousemove",e);
+		}
+		else if(e.eventType == "mouseup")
+		{
+			if(gl.mouse_buttons == 0) //no more buttons pressed
+			{
+				canvas.addEventListener("mousemove", onmouse);
+				var doc = canvas.ownerDocument;
+				doc.removeEventListener("mousemove", onmouse);
+				doc.removeEventListener("mouseup", onmouse);
+			}
+			e.click_time = now - last_click_time;
+			last_click_time = now;
+
+			if(gl.onmouseup)
+				gl.onmouseup(e);
+			LEvent.trigger(gl,"mouseup",e);
+		}
+		else if((e.eventType == "mousewheel" || e.eventType == "wheel" || e.eventType == "DOMMouseScroll"))
+		{
+			e.eventType = "mousewheel";
+			if(e.type == "wheel")
+				e.wheel = -e.deltaY;
+			else
+				e.wheel = (e.wheelDeltaY != null ? e.wheelDeltaY : e.detail * -60);
+			if(gl.onmousewheel)
+				gl.onmousewheel(e);
+			LEvent.trigger(gl, "mousewheel", e);
+		}
+
+		if(gl.onmouse)
+			gl.onmouse(e);
+
+		if(e.eventType != "mousemove")
+			e.stopPropagation();
+		e.preventDefault();
+		return false;
+	}
+
+	//translates touch events in mouseevents
+	function ontouch(e)
+	{
+		var touches = event.changedTouches,
+			first = touches[0],
+			type = "";
+
+		//ignore secondary touches
+        if(e.touches.length && e.changedTouches[0].identifier !== e.touches[0].identifier)
+        	return;
+
+		if(touches > 1)
+			return;
+
+		 switch(event.type)
+		{
+			case "touchstart": type = "mousedown"; break;
+			case "touchmove":  type = "mousemove"; break;
+			case "touchend":   type = "mouseup"; break;
+			default: return;
+		}
+
+		var simulatedEvent = document.createEvent("MouseEvent");
+		simulatedEvent.initMouseEvent(type, true, true, window, 1,
+								  first.screenX, first.screenY,
+								  first.clientX, first.clientY, false,
+								  false, false, false, 0/*left*/, null);
+		first.target.dispatchEvent(simulatedEvent);
+		event.preventDefault();
+	}
+
+	function ongesture(e)
+	{
+		if(gl.ongesture)
+		{
+			e.eventType = e.type;
+			gl.ongesture(e);
+		}
+		event.preventDefault();
+	}
+
+	var keys = gl.keys = {};
+
+	/**
+	* Tells the system to capture key events on the canvas. This will trigger onkey
+	* @method captureKeys
+	* @param {boolean} prevent_default prevent default behaviour (like scroll on the web, etc)
+	* @param {boolean} only_canvas only caches keyboard events if they happen when the canvas is in focus
+	*/
+	var onkey_handler = null;
+	gl.captureKeys = function( prevent_default, only_canvas ) {
+		if(onkey_handler)
+			return;
+		gl.keys = {};
+
+		var target = only_canvas ? gl.canvas : document;
+
+		document.addEventListener("keydown", inner );
+		document.addEventListener("keyup", inner );
+		function inner(e) { onkey(e, prevent_default); }
+		onkey_handler = inner;
+	}
+
+
+
+	function onkey(e, prevent_default)
+	{
+		//trace(e);
+		e.eventType = e.type; //type cannot be overwritten, so I make a clone to allow me to overwrite
+
+		var target_element = e.target.nodeName.toLowerCase();
+		if(target_element === "input" || target_element === "textarea" || target_element === "select")
+			return;
+
+		e.character = String.fromCharCode(e.keyCode).toLowerCase();
+		var prev_state = false;
+		var key = GL.mapKeyCode(e.keyCode);
+		if(!key) //this key doesnt look like an special key
+			key = e.character;
+
+		//regular key
+		if (!e.altKey && !e.ctrlKey && !e.metaKey) {
+			if (key)
+				gl.keys[key] = e.type == "keydown";
+			prev_state = gl.keys[e.keyCode];
+			gl.keys[e.keyCode] = e.type == "keydown";
+		}
+
+		//avoid repetition if key stays pressed
+		if(prev_state != gl.keys[e.keyCode])
+		{
+			if(e.type == "keydown" && gl.onkeydown)
+				gl.onkeydown(e);
+			else if(e.type == "keyup" && gl.onkeyup)
+				gl.onkeyup(e);
+			LEvent.trigger(gl, e.type, e);
+		}
+
+		if(gl.onkey)
+			gl.onkey(e);
+
+		if(prevent_default && (e.isChar || GL.blockable_keys[e.keyIdentifier || e.key ]) )
+			e.preventDefault();
+	}
+
+	//gamepads
+	gl.gamepads = null;
+	function onButton(e, pressed)
+	{
+		console.log(e);
+		if(pressed && gl.onbuttondown)
+			gl.onbuttondown(e);
+		else if(!pressed && gl.onbuttonup)
+			gl.onbuttonup(e);
+		if(gl.onbutton)
+			gl.onbutton(e);
+		LEvent.trigger(gl, pressed ? "buttondown" : "buttonup", e );
+	}
+
+	function onGamepad(e)
+	{
+		console.log(e);
+		if(gl.ongamepad)
+			gl.ongamepad(e);
+	}
+
+	/**
+	* Tells the system to capture gamepad events on the canvas.
+	* @method captureGamepads
+	*/
+	gl.captureGamepads = function()
+	{
+		var getGamepads = navigator.getGamepads || navigator.webkitGetGamepads || navigator.mozGetGamepads;
+		if(!getGamepads) return;
+		this.gamepads = getGamepads.call(navigator);
+
+		//only in firefox
+		window.addEventListener("gamepadButtonDown", function(e) { onButton(e, true); }, false);
+		window.addEventListener("MozGamepadButtonDown", function(e) { onButton(e, true); }, false);
+		window.addEventListener("WebkitGamepadButtonDown", function(e) { onButton(e, true); }, false);
+		window.addEventListener("gamepadButtonUp", function(e) { onButton(e, false); }, false);
+		window.addEventListener("MozGamepadButtonUp", function(e) { onButton(e, false); }, false);
+		window.addEventListener("WebkitGamepadButtonUp", function(e) { onButton(e, false); }, false);
+
+		window.addEventListener("gamepadconnected", onGamepad, false);
+		window.addEventListener("gamepaddisconnected", onGamepad, false);
+	}
+
+	/**
+	* returns the detected gamepads on the system
+	* @method getGamepads
+	*/
+	gl.getGamepads = function()
+	{
+		//gamepads
+		var getGamepads = navigator.getGamepads || navigator.webkitGetGamepads || navigator.mozGetGamepads;
+		if(!getGamepads) return;
+		var gamepads = getGamepads.call(navigator);
+		var gamepad = null;
+		for(var i = 0; i < 4; i++)
+			if (gamepads[i])
+			{
+				gamepad = gamepads[i];
+				if(this.gamepads) //launch connected gamepads: NOT TESTED
+				{
+					if(!this.gamepads[i] && gamepads[i] && this.ongamepadconnected)
+						this.ongamepadconnected(gamepad);
+					else if(this.gamepads[i] && !gamepads[i] && this.ongamepaddisconnected)
+						this.ongamepaddisconnected(this.gamepads[i]);
+				}
+				//xbox controller mapping
+				var xbox = { axes:[], buttons:{}, hat: ""};
+				xbox.axes["lx"] = gamepad.axes[0];
+				xbox.axes["ly"] = gamepad.axes[1];
+				xbox.axes["rx"] = gamepad.axes[2];
+				xbox.axes["ry"] = gamepad.axes[3];
+				xbox.axes["triggers"] = gamepad.axes[4];
+
+				for(var i = 0; i < gamepad.buttons.length; i++)
+				{
+					switch(i) //I use a switch to ensure that a player with another gamepad could play
+					{
+						case 0: xbox.buttons["a"] = gamepad.buttons[i].pressed; break;
+						case 1: xbox.buttons["b"] = gamepad.buttons[i].pressed; break;
+						case 2: xbox.buttons["x"] = gamepad.buttons[i].pressed; break;
+						case 3: xbox.buttons["y"] = gamepad.buttons[i].pressed; break;
+						case 4: xbox.buttons["lb"] = gamepad.buttons[i].pressed; break;
+						case 5: xbox.buttons["rb"] = gamepad.buttons[i].pressed; break;
+						case 6: xbox.buttons["lt"] = gamepad.buttons[i].pressed; break;
+						case 7: xbox.buttons["rt"] = gamepad.buttons[i].pressed; break;
+						case 8: xbox.buttons["back"] = gamepad.buttons[i].pressed; break;
+						case 9: xbox.buttons["start"] = gamepad.buttons[i].pressed; break;
+						case 10: xbox.buttons["ls"] = gamepad.buttons[i].pressed; break;
+						case 11: xbox.buttons["rs"] = gamepad.buttons[i].pressed; break;
+						case 12: if( gamepad.buttons[i].pressed) xbox.hat += "up"; break;
+						case 13: if( gamepad.buttons[i].pressed) xbox.hat += "down"; break;
+						case 14: if( gamepad.buttons[i].pressed) xbox.hat += "left"; break;
+						case 15: if( gamepad.buttons[i].pressed) xbox.hat += "right"; break;
+						case 16: xbox.buttons["home"] = gamepad.buttons[i].pressed; break;
+						default:
+					}
+				}
+				gamepad.xbox = xbox;
+			}
+		this.gamepads = gamepads;
+		return gamepads;
+	}
+
+	/**
+	* launches de canvas in fullscreen mode
+	* @method fullscreen
+	*/
+
 	gl.fullscreen = function()
 	{
 		var c = this.canvas;
@@ -381,4 +693,72 @@ GL.create = function(options) {
 
 	//Return
 	return gl;
+}
+
+GL.mapKeyCode = function(code)
+{
+	var named = {
+		8: 'BACKSPACE',
+		9: 'TAB',
+		13: 'ENTER',
+		16: 'SHIFT',
+		17: 'CTRL',
+		27: 'ESCAPE',
+		32: 'SPACE',
+		37: 'LEFT',
+		38: 'UP',
+		39: 'RIGHT',
+		40: 'DOWN'
+	};
+	return named[code] || (code >= 65 && code <= 90 ? String.fromCharCode(code) : null);
+}
+
+//add useful info to the event
+GL.dragging = false;
+GL.last_pos = [0,0];
+
+GL.augmentEvent = function(e, root_element)
+{
+	var offset_left = 0;
+	var offset_top = 0;
+	var b = null;
+
+	root_element = root_element || e.target || gl.canvas;
+	b = root_element.getBoundingClientRect();
+
+	e.mousex = e.pageX - b.left;
+	e.mousey = e.pageY - b.top;
+	e.canvasx = e.mousex;
+	e.canvasy = b.height - e.mousey;
+	e.deltax = 0;
+	e.deltay = 0;
+
+	//console.log("WHICH: ",e.which," BUTTON: ",e.button, e.type);
+	if(e.type == "mousedown")
+	{
+		this.dragging = true;
+		gl.mouse_buttons |= (1 << e.which); //enable
+	}
+	else if (e.type == "mousemove")
+	{
+	}
+	else if (e.type == "mouseup")
+	{
+		gl.mouse_buttons = gl.mouse_buttons & ~(1 << e.which);
+		//console.log("BUT:", e.button, "MASK:", gl.mouse_buttons);
+		if(gl.mouse_buttons == 0)
+			this.dragging = false;
+	}
+
+	e.deltax = e.mousex - this.last_pos[0];
+	e.deltay = e.mousey - this.last_pos[1];
+	this.last_pos[0] = e.mousex;
+	this.last_pos[1] = e.mousey;
+
+	e.dragging = this.dragging;
+	e.buttons_mask = gl.mouse_buttons;
+
+	e.leftButton = gl.mouse_buttons & (1<<GL.LEFT_MOUSE_BUTTON);
+	e.rightButton = gl.mouse_buttons & (1<<GL.RIGHT_MOUSE_BUTTON);
+	e.isButtonPressed = function(num) { return this.buttons_mask & (1<<num); }
 }

@@ -24,7 +24,17 @@ function init()
     var mvp = mat4.create();
     var temp = mat4.create();
 
-
+    //get mouse actions
+    gl.captureMouse();
+    gl.onmousemove = function(e)
+    {
+        if(e.dragging)
+        {
+            mat4.rotateY(model,model,e.deltax * 0.01);
+            cam_pos[1] += e.deltay;
+        }
+    }
+    
     //set the camera position
     mat4.perspective(persp, 45 * GL.utils.DEG2RAD, gl.canvas.width / gl.canvas.height, 0.1, 1000);
     mat4.lookAt(view, cam_pos,[0,0,0], [0,1,0]);
@@ -74,18 +84,6 @@ function init()
                 u_mvp: mvp
             }).draw(mesh, gl.LINES);
 
-        //define the elememt that will recive the events:
-        var events = GL.events
-        events.set_generic_events(container)
-
-        gl.onupdate = function(dt)
-        {
-            if(events.mouse.left){
-                mat4.rotateY(model,model,events.mouse.rel_x * 0.01);
-                cam_pos[1] += events.mouse.rel_y;
-            }
-            events.reset_frame_events()
-        }
     };
 
     //update loop

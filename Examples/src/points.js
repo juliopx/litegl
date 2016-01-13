@@ -2,6 +2,8 @@
 var GL = require('../../litegl.js');
 var glm = GL.glmatrix, mat3=glm.mat3, mat4=glm.mat4,
     vec2=glm.vec2, vec3=glm.vec3, vec4=glm.vec4, quat=glm.quat;
+var Shader = GL.Shader
+var DEG2RAD = GL.utils.DEG2RAD
 
 	function init()
 	{
@@ -40,8 +42,24 @@ var glm = GL.glmatrix, mat3=glm.mat3, mat4=glm.mat4,
 
 		var mode = gl.LINES;
 
+        //events
+        gl.captureMouse();
+        gl.onmousemove = function(e)
+        {
+            if(e.dragging)
+            {
+                vec3.rotateY(cam_pos,cam_pos,e.deltax * 0.01);
+                vec3.scale(cam_pos,cam_pos,1.0 + e.deltay * 0.01);
+            }
+        }
+
+        gl.onmouseup = function(e) {
+            if(e.click_time < 300)
+                mode = (mode == gl.LINE_STRIP ? gl.POINTS : gl.LINE_STRIP );
+        };
+
 		//basic rendering shader
-		var points_shader = new GL.Shader('\
+		var points_shader = new Shader('\
 				precision highp float;\
 				attribute vec3 a_vertex;\
 				uniform mat4 u_mvp;\
@@ -58,7 +76,7 @@ var glm = GL.glmatrix, mat3=glm.mat3, mat4=glm.mat4,
 				}\
 			');
 
-		var lines_shader = new GL.Shader('\
+		var lines_shader = new Shader('\
 				precision highp float;\
 				attribute vec3 a_vertex;\
 				uniform mat4 u_mvp;\
@@ -121,29 +139,10 @@ var glm = GL.glmatrix, mat3=glm.mat3, mat4=glm.mat4,
 			}
 		}
 
-		//define the elememt that will recive the events:
-		var events = GL.events
-		events.set_generic_events(container)
-
 		var first_time = true
 		//update loop
 		gl.onupdate = function(dt)
 		{
-			//rotate sphere acording mouse movement
-			if(events.mouse.left){
-				if(first_time){
-					mode = (mode == gl.LINE_STRIP ? gl.POINTS : gl.LINE_STRIP );
-				};
-				vec3.rotateY(cam_pos,cam_pos, events.mouse.rel_x * 0.01);
-				vec3.scale(cam_pos,cam_pos,1.0 + events.mouse.rel_y * 0.01);
-				first_time = false
-
-			} else{
-				first_time = true
-			}
-
-			events.reset_frame_events()
-
 			//apply lorenz attractor equation to every point
 
 			var time = Date.now() * 0.001;

@@ -13,9 +13,9 @@ gl.animate();
 var camera_position = vec3.fromValues(0,100,100);
 
 //build the mesh
-var mesh = GL.Mesh.primitives.cube({size:10});
-var plane = GL.Mesh.primitives.plane({size:500,xz: true});
-var sphere = GL.Mesh.primitives.sphere({size:1});
+var mesh = GL.Mesh.cube({size:10});
+var plane = GL.Mesh.plane({size:500,xz: true});
+var sphere = GL.Mesh.sphere({size:1});
 
 var texture = GL.Texture.fromURL("texture.jpg", { minFilter: gl.LINEAR});
 
@@ -271,20 +271,17 @@ gl.ondraw = function()
     gl.drawTexture(texture_final, gl.canvas.width * 0.5, gl.canvas.height * 0.5, gl.canvas.width * 0.5, gl.canvas.height * 0.5);
 };
 
-//get mouse actions
-// gl.captureMouse();
-// gl.onmousemove = function(e)
-// {
-//     if(e.dragging)
-//     {
-//         vec3.rotateY( camera_position, camera_position, e.deltax * 0.01 );
-//         camera_position[1] -= e.deltay * 0.5;
-//     }
-// }
+// get mouse actions
+gl.captureMouse();
+gl.onmousemove = function(e)
+{
+    if(e.dragging)
+    {
+        vec3.rotateY( camera_position, camera_position, e.deltax * 0.01 );
+        camera_position[1] -= e.deltay * 0.5;
+    }
+}
 
-//define the elememt that will recive the events:
-var events = GL.events
-events.set_generic_events(container)
 
 //update loop
 gl.onupdate = function(dt)
@@ -295,13 +292,6 @@ gl.onupdate = function(dt)
         var light = lights[i];
         light.position[0] = Math.sin( i + time ) * 100;
         light.position[2] = Math.cos( i * 2 + time + 5 ) * 50;
-
-        //rotate camera position
-        if(events.mouse.left){
-            vec3.rotateY( camera_position, camera_position, events.mouse.rel_x * 0.01 );
-            camera_position[1] -= events.mouse.rel_y  * 0.5;
-        }
-        events.reset_frame_events()
 
     }
 };

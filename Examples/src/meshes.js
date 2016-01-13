@@ -21,17 +21,17 @@ for(var i = 0; i < 10; i++)
     objects.push(object);
 }
 
-objects[0].mesh = GL.Mesh.primitives.plane();
-objects[1].mesh = GL.Mesh.primitives.plane({xz:true});
-objects[2].mesh = GL.Mesh.primitives.circle({xz:true});
-objects[3].mesh = GL.Mesh.primitives.cube();
-objects[4].mesh = GL.Mesh.primitives.box({sizey:2});
-objects[5].mesh = GL.Mesh.primitives.sphere();
-objects[6].mesh = GL.Mesh.primitives.sphere({hemi:true});
-objects[7].mesh = GL.Mesh.primitives.cylinder({radius:0.5});
-objects[8].mesh = GL.Mesh.primitives.grid({size:1});
+objects[0].mesh = GL.Mesh.plane();
+objects[1].mesh = GL.Mesh.plane({xz:true});
+objects[2].mesh = GL.Mesh.circle({xz:true});
+objects[3].mesh = GL.Mesh.cube();
+objects[4].mesh = GL.Mesh.box({sizey:2});
+objects[5].mesh = GL.Mesh.sphere();
+objects[6].mesh = GL.Mesh.sphere({hemi:true});
+objects[7].mesh = GL.Mesh.cylinder({radius:0.5});
+objects[8].mesh = GL.Mesh.grid({size:1});
 objects[8].primitive = gl.LINES;
-objects[9].mesh = GL.Mesh.primitives.icosahedron({size:1,subdivisions:1});
+objects[9].mesh = GL.Mesh.icosahedron({size:1,subdivisions:1});
 
 //create basic matrices for cameras and transformation
 var proj = mat4.create();
