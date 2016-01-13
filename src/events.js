@@ -179,7 +179,7 @@ var set_generic_events = exports.set_generic_events = function(root_element) {
     var wheel = function(event) {
         // this value will eventually be normalized to be pixels or heights
         // until then, we'll have 1 or -1
-        mouse.wheel += max(-1, min(1, event.deltaY));
+        mouse.wheel += Math.max(-1, Math.min(1, event.deltaY));
         if (mouse.cancel_wheel) {
             return event.preventDefault();
         }
