@@ -1,7 +1,7 @@
 # litegl
 Litegl is a library that wraps WebGL to make it more user-friendly by creating classes for managing different items like Buffer, Mesh, Texture, Shader and other common aspects of any WebGL applications. It is a fork from Litegl.js
 
- * New events system extracted from myou engine (https://myou.cat) by [Alberto Torres Ruiz](https://github.com/DiThi) and [Julio Manuel López](http://pixelements.net). 
+ * New events system extracted from [myou engine](https://myou.cat) by [Alberto Torres Ruiz](https://github.com/DiThi) and [Julio Manuel López](http://pixelements.net). 
  * Modifications to get it working as npm module.
  
 Litegl.js is a fork from [LightGL.js](https://github.com/evanw/lightgl.js/) by [Evan Wallace](http://madebyevan.com), but some major changes have been made.
