@@ -209,41 +209,7 @@ GL.create = function(options) {
 		}
 	};
 
-	/**
-	* Tells the system to capture mouse events on the canvas.
-	* This will trigger onmousedown, onmousemove, onmouseup, onmousewheel callbacks assigned in the gl context
-	* example: gl.onmousedown = function(e){ ... }
-	* The event is a regular MouseEvent with some extra parameters
-	* @method captureMouse
-	* @param {boolean} capture_wheel capture also the mouse wheel
-	*/
-	gl.captureMouse = function(capture_wheel) {
-
-		canvas.addEventListener("mousedown", onmouse);
-		canvas.addEventListener("mousemove", onmouse);
-		if(capture_wheel)
-		{
-			canvas.addEventListener("mousewheel", onmouse, false);
-			canvas.addEventListener("wheel", onmouse, false);
-			//canvas.addEventListener("DOMMouseScroll", onmouse, false); //deprecated or non-standard
-		}
-		//prevent right click context menu
-		canvas.addEventListener("contextmenu", function(e) { e.preventDefault(); return false; });
-
-		canvas.addEventListener("touchstart", ontouch, true);
-		canvas.addEventListener("touchmove", ontouch, true);
-		canvas.addEventListener("touchend", ontouch, true);
-		canvas.addEventListener("touchcancel", ontouch, true);
-
-		canvas.addEventListener('gesturestart', ongesture );
-		canvas.addEventListener('gesturechange', ongesture );
-		canvas.addEventListener('gestureend', ongesture );
-	}
-
-	/**
-	* launches de canvas in fullscreen mode
-	* @method fullscreen
-	*/
+		
 	gl.fullscreen = function()
 	{
 		var c = this.canvas;

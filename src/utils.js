@@ -1,3 +1,4 @@
+var LEvent  = require('./levent.js').LEvent
 
 exports.DEG2RAD = 0.0174532925;
 exports.RAD2DEG = 57.295779578552306;

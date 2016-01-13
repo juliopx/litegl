@@ -7,6 +7,8 @@
 var GL = module.exports;
 var glm = require('./gl-matrix-extra.js'), mat3=glm.mat3, mat4=glm.mat4,
 	vec2=glm.vec2, vec3=glm.vec3, vec4=glm.vec4, quat=glm.quat;
+var utils  = require('./utils.js')
+var BBox = require('./geo.js').BBox
 
 GL.Indexer = function Indexer() {
   this.unique = [];
@@ -1392,7 +1394,7 @@ Mesh.fromURL = function(url, on_complete, gl, options)
 	var mesh = new GL.Mesh(undefined,undefined,undefined,gl);
 	mesh.ready = false;
 
-	HttpRequest( url, null, function(data) {
+	utils.HttpRequest( url, null, function(data) {
 		var pos = url.lastIndexOf(".");
 		var ext = url.substr(pos+1);
 		mesh.parse( data, ext );

@@ -14,6 +14,7 @@ exports.Octree = require('./src/octree.js')
 exports.FBO = require('./src/fbo.js').FBO
 exports.utils = require('./src/utils.js')
 exports.glmatrix = require('./src/gl-matrix-extra.js')
+exports.geometry = require('./src/geo.js')
 
 raytracer = require('./src/raytracer.js')
 exports.HitTest = raytracer.HitTest
