@@ -3,10 +3,10 @@
 require('!!file?name=cross-cubemap.png!../static-files/cross-cubemap.png')
 
 //create the rendering context
-var container = document.body;
 var GL = require('../../litegl.js');
 var glm = GL.glmatrix, mat3=glm.mat3, mat4=glm.mat4,
     vec2=glm.vec2, vec3=glm.vec3, vec4=glm.vec4, quat=glm.quat;
+var container = document.body;
 var gl = GL.create({width: container.offsetWidth, height: container.offsetHeight});
 container.appendChild(gl.canvas);
 gl.animate();
@@ -87,10 +87,8 @@ gl.onupdate = function(dt)
 
     //rotate sphere acording mouse movement
     if(events.mouse.left === true){
-    mat4.rotateY(model,model,dt*events.mouse.rel_x * 0.5)
-    }
-    if(events.mouse.left === true){
-    mat4.rotateX(model,model,dt*events.mouse.rel_y * 0.5)
+        mat4.rotateY(model,model,dt*events.mouse.rel_x * 0.5)
+        mat4.rotateX(model,model,dt*events.mouse.rel_y * 0.5)
     }
     events.reset_frame_events()
 };
